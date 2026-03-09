@@ -9,21 +9,55 @@ date: "3/9/2026"
 
 Train and validate a spatial predictive model using data from Calgary. Deploy model to predict a flood in City X. Write a report to the "Director of Disaster Planning" with your findings. To be clear, to do this analysis, you will copy the code from the land conservation markdown (predicting the probability of land conservation) and create new independent variables for a model that predicts probability of flood inundation.
 
+---
+
 ## Basie Procedure
 
 1.  Choose City X. Choose a city with similar hydrology, topography, and climate, with available data comparable to Calgary's. Don't choose a city on the ocean, or a city in a desert. 
 
 [The city we choose is: Salt Lake City]
 
+Why Calgary and Salt Lake City?
+
+[]
+
+```{r setup, include=FALSE, message=FALSE, warning=FALSE}
+
+# Global chunk options
+knitr::opts_chunk$set(
+  echo = TRUE,      # show code in output
+  warning = FALSE,  # hide warnings
+  message = FALSE   # hide package messages
+)
+
+# Avoid scientific notation
+options(scipen = 999)
+
+# Load libraries
+library(caret)
+library(pscl)
+library(plotROC)
+library(pROC)
+library(sf)
+library(tidyverse)
+library(knitr)
+library(kableExtra)
+library(tigris)
+library(viridis)
+
+# Set WD
+setwd("C:/Users/Gab/OneDrive/Documents/SPRING 2026/CPLN6750_Land Use and Environmental Modeling/flood_inundation_probability/Midterm")
+```
+
 2. Gather open data from Calgary’s open data site (https://data.calgary.ca/Links to an external site.) and City X's open data site as well as other internet sources. Build a fishnet grid for each city with the same sized cells. Calgary flood extents and other data are hosted on canvas in Module 5, they are called midTermProject_Data.zip
 
-```{r}
-setwd()
-
+```{r load_data, warning = FALSE, message = FALSE, results = "hide"}
 
 ```
 
 3. Using what we’ve learned about feature engineering, build as many useful variables describing the natural, hydrological and built environment factors that might help explain flood inundation. Form a hypothesis to motivate your search for data. You must include at least one feature from the watershed analysis. You need to build the exact same features for Calgary AND City X. We will have a feature engineering workshop in class.
+
+[The variables we are choosing are: ]
 
 4. Join your features to the vector Fishnet.
 
@@ -34,6 +68,8 @@ setwd()
 7. Using the predict function, feed the exact same independent variables from City X into your model object. Output a prediction for each cell in that city.
 
 8. Visualize and communicate your results.
+
+---
 
 ## Deliverables
 
@@ -51,6 +87,8 @@ Your report should contain:
 -Second, your inundation predictions for Calgary (entire dataset);
 -Third, predictions for your comparable city.
 5. A conclusion section commenting on the quality of your model, its usefulness in your comparable city, and your opinion about the utility of this modeling approach.
+
+---
 
 ## Notes
 There are three files as illustrated above in Module 5 on Canvas (midtermdata.zip). There is the satellite image with flood inundation in light blue and cloud cover in red. You will have to reclassify into a raster of 0=no inundation and 1=inundation. The pink polygon is the study area which you will note has a greater area than the raster. You can 1) create a fishnet at the study area extent in ArcGIS with this toolLinks to an external site., or in R with sf::st_make_grid.Links to an external site. You will then have to 2) create an unique id field in the fishnet shapefile and 3) use zonal statistics as table to get the raster values into the fishnet. Finally 4) remove the grid cells to the north for which we have no raster data from the fishnet.  You also have a DEM raster as above. For your comparison city, look to their open data site for Digital Elevation Map (DEM). Otherwise, go to EarthExplorerLinks to an external site. and download Shuttle Radar Topography Mission data (SRTMLinks to an external site.) data.
