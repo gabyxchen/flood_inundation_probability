@@ -1,0 +1,21 @@
+---
+title: "Estimating a flood inundation probability map"
+format: html
+editor: visual
+---
+
+## Introduction
+Train and validate a spatial predictive model using data from Calgary. Deploy model to predict a flood in City X. Write a report to the "Director of Disaster Planning" with your findings. To be clear, to do this analysis, you will copy the code from the land conservation markdown (predicting the probability of land conservation) and create new independent variables for a model that predicts probability of flood inundation.
+
+## Basie Procedure
+1. Choose City X. Choose a city with similar hydrology, topography, and climate, with available data comparable to Calgary's. Don't choose a city on the ocean, or a city in a desert.
+[The city we choose is: Salt Lake City]
+
+
+
+
+
+```{r}
+
+
+```
