@@ -19,7 +19,7 @@ Train and validate a spatial predictive model using data from Calgary. Deploy mo
 
 Why Calgary and Salt Lake City?
 
-[]
+[Calgary and Salt Lake City share several environmental characteristics that make them suitable for comparative flood modeling. Both cities are located inland in western North America and are strongly shaped by mountain hydrology. Calgary lies near the eastern foothills of the Rocky Mountains and is influenced by the Bow and Elbow river systems, while Salt Lake City sits along the Wasatch Range and is influenced by watersheds draining into the Great Salt Lake basin. In both cases, snowpack accumulation in nearby mountains contributes significantly to seasonal runoff, which can increase flood risk during periods of rapid snowmelt or intense rainfall.]
 
 ```{r setup, include=FALSE, message=FALSE, warning=FALSE}
 
@@ -47,11 +47,13 @@ library(viridis)
 
 # Set WD
 setwd("C:/Users/Gab/OneDrive/Documents/SPRING 2026/CPLN6750_Land Use and Environmental Modeling/flood_inundation_probability/Midterm")
+
 ```
 
 2. Gather open data from Calgary’s open data site (https://data.calgary.ca/Links to an external site.) and City X's open data site as well as other internet sources. Build a fishnet grid for each city with the same sized cells. Calgary flood extents and other data are hosted on canvas in Module 5, they are called midTermProject_Data.zip
 
 ```{r load_data, warning = FALSE, message = FALSE, results = "hide"}
+
 
 ```
 
