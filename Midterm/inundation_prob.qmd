@@ -44,6 +44,7 @@ library(knitr)
 library(kableExtra)
 library(tigris)
 library(viridis)
+library(terra)
 
 # Set WD
 setwd("C:/Users/Gab/OneDrive/Documents/SPRING 2026/CPLN6750_Land Use and Environmental Modeling/flood_inundation_probability/Midterm")
@@ -53,7 +54,7 @@ setwd("C:/Users/Gab/OneDrive/Documents/SPRING 2026/CPLN6750_Land Use and Environ
 2. Gather open data from Calgary’s open data site (https://data.calgary.ca/Links to an external site.) and City X's open data site as well as other internet sources. Build a fishnet grid for each city with the same sized cells. Calgary flood extents and other data are hosted on canvas in Module 5, they are called midTermProject_Data.zip
 
 ```{r load_data, warning = FALSE, message = FALSE, results = "hide"}
-
+cal_dem <- st_read("data/calgaryDEM.ovr")
 
 ```
 
