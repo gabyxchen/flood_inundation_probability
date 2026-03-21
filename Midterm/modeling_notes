@@ -111,3 +111,48 @@ precision
 recall
 specificity
 
+#测试阈值调整时， 模型变化
+library(pROC)
+
+roc_obj <- roc(test$flooded, test$prob)
+plot(roc_obj)
+auc(roc_obj)
+
+#对整个Calgary预测
+calgary_model$pred_prob <- predict(model1, newdata = calgary_model, type = "response")
+calgary_model$pred_class <- ifelse(calgary_model$pred_prob > 0.5, 1, 0)
+
+#盐城胡预测
+slc_model$pred_prob <- predict(model1, newdata = slc_model, type = "response")
+slc_model$pred_class <- ifelse(slc_model$pred_prob > 0.5, 1, 0)
+
+#training set分类
+train$prob <- predict(model1, newdata = train, type = "response")
+train$pred_class <- ifelse(train$prob > 0.5, 1, 0)
+
+train <- train %>%
+  mutate(result_type = case_when(
+    flooded == 1 & pred_class == 1 ~ "True Positive",
+    flooded == 0 & pred_class == 0 ~ "True Negative",
+    flooded == 0 & pred_class == 1 ~ "False Positive",
+    flooded == 1 & pred_class == 0 ~ "False Negative"
+  ))
+
+table(train$result_type)
+
+#导出csv
+library(dplyr)
+library(readr)
+
+train_export <- train %>%
+  select(grid_id, flooded, pred_class, result_type)
+
+calgary_export <- calgary_model %>%
+  select(grid_id, flooded, pred_prob, pred_class)
+
+slc_export <- slc_model %>%
+  select(grid_id, pred_prob, pred_class)
+
+write_csv(train_export, "c:/users/zyq92/OneDrive - PennO365/Landuse_Modeling/Midterm/train_results.csv")
+write_csv(calgary_export, "c:/users/zyq92/OneDrive - PennO365/Landuse_Modeling/Midterm/calgary_predictions.csv")
+write_csv(slc_export, "c:/users/zyq92/OneDrive - PennO365/Landuse_Modeling/Midterm/slc_predictions.csv")
