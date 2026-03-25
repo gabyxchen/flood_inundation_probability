@@ -1,0 +1,158 @@
+library(tidyverse)
+library(tidyverse)
+library(pROC)
+calgary <- read_csv("calgary.csv")
+slc <- read_csv("slc.csv")
+
+#check data
+dim(calgary)
+dim(slc)
+
+names(calgary)
+names(slc)
+
+glimpse(calgary)
+glimpse(slc)
+
+summary(calgary$INUNAREA)
+summary(calgary$INUNMAX)
+
+summary(slc$INUNAREA)
+summary(slc$INUNMAX)
+
+table(calgary$INUNAREA > 0, useNA = "ifany")
+table(calgary$INUNMAX, useNA = "ifany")
+
+#统一slope名字
+library(tidyverse)
+library(pROC)
+
+calgary <- calgary %>%
+  rename(SLOPEMEAN = SLPMEAN)
+
+#用INUNMAX建Calgary模型
+calgary_model <- calgary %>%
+  select(grid_id,
+         flooded = INUNMAX,
+         DEMMEAN,
+         SLOPEMEAN,
+         FACSUM,
+         DISTMEAN,
+         PCT) %>%
+  drop_na()
+
+#盐湖城建立对应自变量去掉NA
+slc_model <- slc %>%
+  select(grid_id,
+         DEMMEAN,
+         SLOPEMEAN,
+         FACSUM,
+         DISTMEAN,
+         PCT) %>%
+  drop_na()
+
+#检查
+dim(calgary_model)
+dim(slc_model)
+
+table(calgary_model$flooded)
+prop.table(table(calgary_model$flooded))
+
+#分training和test数据
+set.seed(123)
+
+train_index <- sample(seq_len(nrow(calgary_model)), size = 0.7 * nrow(calgary_model))
+
+train <- calgary_model[train_index, ]
+test  <- calgary_model[-train_index, ]
+
+ #检查分割合理性
+dim(train)
+dim(test)
+
+table(train$flooded)
+table(test$flooded)
+
+#训练glm模型
+model1 <- glm(
+  flooded ~ DEMMEAN + SLOPEMEAN + FACSUM + DISTMEAN + PCT,
+  data = train,
+  family = binomial(link = "logit")
+)
+
+summary(model1)
+
+#用模型预测test数据
+test$prob <- predict(model1, newdata = test, type = "response")
+head(test$prob)
+summary(test$prob)
+
+#把概率分为0/1两类
+test$pred_class <- ifelse(test$prob > 0.5, 1, 0)
+
+#confusion matrix 预测结果和真实结果对比
+cm <- table(Predicted = test$pred_class, Actual = test$flooded)
+cm
+
+#提取accuarcy matrix
+TN <- cm["0", "0"]
+FN <- cm["0", "1"]
+FP <- cm["1", "0"]
+TP <- cm["1", "1"]
+
+#计算准确率
+accuracy <- (TP + TN) / sum(cm)
+precision <- TP / (TP + FP)
+recall <- TP / (TP + FN)
+specificity <- TN / (TN + FP)
+
+accuracy
+precision
+recall
+specificity
+
+#测试阈值调整时， 模型变化
+library(pROC)
+
+roc_obj <- roc(test$flooded, test$prob)
+plot(roc_obj)
+auc(roc_obj)
+
+#对整个Calgary预测
+calgary_model$pred_prob <- predict(model1, newdata = calgary_model, type = "response")
+calgary_model$pred_class <- ifelse(calgary_model$pred_prob > 0.5, 1, 0)
+
+#盐城胡预测
+slc_model$pred_prob <- predict(model1, newdata = slc_model, type = "response")
+slc_model$pred_class <- ifelse(slc_model$pred_prob > 0.5, 1, 0)
+
+#training set分类
+train$prob <- predict(model1, newdata = train, type = "response")
+train$pred_class <- ifelse(train$prob > 0.5, 1, 0)
+
+train <- train %>%
+  mutate(result_type = case_when(
+    flooded == 1 & pred_class == 1 ~ "True Positive",
+    flooded == 0 & pred_class == 0 ~ "True Negative",
+    flooded == 0 & pred_class == 1 ~ "False Positive",
+    flooded == 1 & pred_class == 0 ~ "False Negative"
+  ))
+
+table(train$result_type)
+
+#导出csv
+library(dplyr)
+library(readr)
+
+train_export <- train %>%
+  select(grid_id, flooded, pred_class, result_type)
+
+calgary_export <- calgary_model %>%
+  select(grid_id, flooded, pred_prob, pred_class)
+
+slc_export <- slc_model %>%
+  select(grid_id, pred_prob, pred_class)
+
+write_csv(train_export, "Midterm/results/train_results.csv")
+write_csv(calgary_export, "Midterm/results/calgary_predictions.csv")
+write_csv(slc_export, "Midterm/results/slc_predictions.csv")
