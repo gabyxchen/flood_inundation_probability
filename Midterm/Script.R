@@ -20,7 +20,7 @@ summary(calgary$INUNMAX)
 summary(slc$INUNAREA)
 summary(slc$INUNMAX)
 
-table(calgary$INUNAREA > 0, useNA = "ifany")
+table(calgary$INUNAREA == 250000, useNA = "ifany")
 table(calgary$INUNMAX, useNA = "ifany")
 
 #统一slope名字
@@ -50,6 +50,17 @@ slc_model <- slc %>%
          DISTMEAN,
          PCT) %>%
   drop_na()
+
+# standardize DEMMEAN
+calgary_model <- calgary_model %>%
+  mutate(
+    DEMMEAN_z = as.numeric(scale(DEMMEAN)
+  ))
+
+slc_model <- slc_model %>%
+  mutate(
+    DEMMEAN_z = as.numeric(scale(DEMMEAN)
+    ))
 
 #检查
 dim(calgary_model)
@@ -81,6 +92,19 @@ model1 <- glm(
 )
 
 summary(model1)
+
+model2 <- glm(
+  flooded ~ DEMMEAN + SLOPEMEAN + DISTMEAN + PCT,
+  data = train,
+  family = binomial(link = "logit")
+)
+
+summary(model2)
+
+cat("Model 1 AIC:", model1$aic, "\n")
+cat("Model 2 AIC:", model2$aic, "\n")
+
+print("Model 1 is better (lower AIC)")
 
 #用模型预测test数据
 test$prob <- predict(model1, newdata = test, type = "response")
